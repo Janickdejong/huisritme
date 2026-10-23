@@ -839,27 +839,28 @@ function defaultsMirey(){
     thesis:{next:'',steps:[],days:[],part:'ochtend',calm:true,sessionMin:45,session:null}
   };
 }
+/* Dagritme van de huisarts */
+function ritmeJanick(){return [
+  {id:'h1',text:'Opstaan, elke dag dezelfde tijd',cat:'zorg',part:'ochtend',time:'07:30',min:5,basic:true},
+  {id:'h2',text:'Ontbijt: glas melk, ontbijtkoek en een banaan',cat:'koken',part:'ochtend',time:'07:45',min:15,basic:true},
+  {id:'h3',text:'Wandelen, 30 minuten, en naar de vogels luisteren',cat:'bewegen',part:'ochtend',time:'08:15',min:30},
+  {id:'h4',text:'Een uur liggen',cat:'rust',part:'ochtend',time:'09:30',min:60,basic:true},
+  {id:'h5',text:'Tussendoortje: een appel of ander fruit',cat:'koken',part:'ochtend',time:'10:45',min:5},
+  {id:'h6',text:'Lunch',cat:'koken',part:'middag',time:'12:30',min:20,basic:true},
+  {id:'h7',text:'Tussendoortje: iets gezonds, zoals noten',cat:'koken',part:'middag',time:'14:30',min:5},
+  {id:'h8',text:'Een uur liggen',cat:'rust',part:'middag',time:'15:00',min:60,basic:true},
+  {id:'h9',text:'Avondeten',cat:'koken',part:'avond',time:'17:30',min:30,basic:true},
+  {id:'h10',text:'Boekje lezen, tv kijken of knuffelen met de kinderen',cat:'kinderen',part:'avond',time:'18:30',min:30},
+  {id:'h11',text:'Wandelen en naar de vogels luisteren',cat:'bewegen',part:'avond',time:'19:30',min:30},
+  {id:'h12',text:'SSRI innemen',cat:'zorg',part:'avond',time:'21:30',min:1,basic:true,remind:'21:30'},
+  {id:'h13',text:'Naar bed, elke dag dezelfde tijd',cat:'rust',part:'avond',time:'22:30',min:5,basic:true}
+];}
 function defaultsJanick(){
   var d=defaultsMirey();
   d.setupDone=true;
   d.settings.washDays=[];d.settings.shopDay=-1;d.settings.palette='salie';
   d.jar.on=false;
-  d.tasks=[
-    {id:'j1',text:'Opstaan om half acht',cat:'zorg',part:'ochtend',min:5,basic:true},
-    {id:'j2',text:'Gordijnen open en een glas water',cat:'zorg',part:'ochtend',min:5,basic:true},
-    {id:'j3',text:'Rustig ontbijten',cat:'koken',part:'ochtend',min:15,basic:true},
-    {id:'j4',text:'Kinderen naar school brengen',cat:'kinderen',part:'ochtend',min:20,days:[1,2,3,4,5]},
-    {id:'j5',text:'Wandelen, twintig minuten buiten',cat:'bewegen',part:'ochtend',min:20,basic:true},
-    {id:'j6',text:'Lunch',cat:'koken',part:'middag',min:15,basic:true},
-    {id:'j7',text:'Rusten zonder scherm',cat:'rust',part:'middag',min:30,basic:true},
-    {id:'j8',text:'Iets kleins doen, zonder haast',cat:'eigen',part:'middag',min:15},
-    {id:'j9',text:'Even naar buiten of bewegen',cat:'bewegen',part:'middag',min:15},
-    {id:'j10',text:'Samen eten',cat:'koken',part:'avond',min:30,basic:true},
-    {id:'j11',text:'Tijd met de kinderen',cat:'kinderen',part:'avond',min:20},
-    {id:'j12',text:'Tijd met Mirey',cat:'zorg',part:'avond',min:30},
-    {id:'j13',text:'Schermen weg',cat:'rust',part:'avond',time:'21:30',min:5,basic:true},
-    {id:'j14',text:'Naar bed',cat:'rust',part:'avond',time:'22:30',min:5,basic:true}
-  ];
+  d.tasks=ritmeJanick();d.ritme=2;
   return d;
 }
 function normalize(s){
@@ -890,6 +891,7 @@ function normalize(s){
   }
   if(s.wash&&typeof s.wash==='object')s.wash={lastStart:s.wash.lastStart||null};
   s.layout='parts';
+  if(ME&&s.ritme!==2){s.tasks=ritmeJanick().concat(s.tasks.filter(function(t){return !/^j\d+$/.test(t.id);}));s.ritme=2;}
   Object.keys(d).forEach(function(k){if(s[k]===undefined||s[k]===null&&k!=='defaultLunch')s[k]=d[k];});
   ['menu','energy','settings','shop','wash','thesis','log','clean','roomPlan','jar'].forEach(function(k){if(typeof s[k]!=='object'||Array.isArray(s[k]))s[k]=d[k];});
   (function(){var dj=d.jar,j=s.jar;Object.keys(dj).forEach(function(k){if(typeof j[k]!==typeof dj[k])j[k]=dj[k];});if(j.v!==5){j.pts=0;j.size=12;j.rounds=0;j.v=5;}j.pts=Math.max(0,Math.round(j.pts));if([9,12,16].indexOf(j.size)<0)j.size=12;if(!j.started)j.started=dkey();})();
