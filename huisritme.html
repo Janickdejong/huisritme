@@ -1558,7 +1558,7 @@ function timeline(k){
   if(allday.length)html+='<div class="allday">Hele dag</div><div class="grid">'+allday.map(evtRow).join('')+'</div>';
   PARTS.forEach(function(p){
     var g=items.filter(function(i){return i.part===p.id;}),isNow=isToday&&p.id===cp;
-    g=g.filter(function(i){return !i.done;}).concat(g.filter(function(i){return i.done;}));
+    if(!ME)g=g.filter(function(i){return !i.done;}).concat(g.filter(function(i){return i.done;}));
     var pe=evs.filter(function(e){return e.time&&partOfMin(toMin(e.time))===p.id;});
     var past=isToday&&pIdx(p.id)<pIdx(cp),open=!past||!!openPast[p.id];
     if(past){
