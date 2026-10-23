@@ -1274,13 +1274,13 @@ function itemsFor(k){
     it.skipped=!!lg.skip[it.id]&&!it.done;
     out.push(it);
   });
-  var tm=addDays(k,1),dt=dinnerFor(tm);
+  var tm=addDays(k,1),dt=ME?null:dinnerFor(tm);
   if(dt&&typeof dt==='object'&&dt.prep){
     var pid='prep-'+tm;
     out.push({id:pid,text:'Voor morgen: '+dt.prep,hint:'Morgen eten jullie '+dt.name.toLowerCase()+'.',cat:'koken',part:(isToday&&lg.moved[pid])||'avond',time:null,ord:999,kind:'prep',min:5,done:!!lg.done[pid],skipped:!!lg.skip[pid]&&!lg.done[pid]});
   }
-  var th=thesisItem(k);if(th)out.push(th);
-  washItems(k).forEach(function(x){out.push(x);});
+  if(!ME){var th=thesisItem(k);if(th)out.push(th);
+  washItems(k).forEach(function(x){out.push(x);});}
   /* per dagdeel: eerst de thesis, dan vrije taken in hun eigen volgorde, daarna wat een vaste tijd heeft */
   out.sort(function(a,b){
     var d=pIdx(a.part)-pIdx(b.part);if(d)return d;
