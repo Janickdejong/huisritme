@@ -1,0 +1,20 @@
+{
+  "name": "huisritme",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "www": "node scripts/www.js",
+    "sync": "node scripts/www.js && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/local-notifications": "^6.1.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@fontsource/nunito-sans": "^5.1.0",
+    "@fontsource/young-serif": "^5.1.0"
+  }
+}

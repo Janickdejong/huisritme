@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2D6A6F</color>
+    <color name="colorPrimaryDark">#ECF1F2</color>
+    <color name="colorAccent">#2D6A6F</color>
+    <color name="hr_bg">#2D6A6F</color>
+    <color name="hr_page">#ECF1F2</color>
+</resources>

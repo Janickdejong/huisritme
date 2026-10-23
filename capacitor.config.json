@@ -1,0 +1,14 @@
+{
+  "appId": "nl.janick.huisritme",
+  "appName": "Huisritme",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#ECF1F2"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_hr",
+      "iconColor": "#2D6A6F"
+    }
+  }
+}
