@@ -891,6 +891,7 @@ function normalize(s){
   }
   if(s.wash&&typeof s.wash==='object')s.wash={lastStart:s.wash.lastStart||null};
   s.layout='parts';
+  if(ME&&!s.oxa1){s.oxa1=true;var tdy=today();[['2026-10-23','avond','21:30'],['2026-10-24','ochtend','07:45'],['2026-10-24','avond','21:30'],['2026-10-25','ochtend','07:45']].forEach(function(o,i){if(o[0]>=tdy)s.tasks.push({id:'oxa'+(i+1),text:'Oxazepam innemen',cat:'zorg',part:o[1],time:o[2],min:1,basic:true,date:o[0],remind:o[2],noCarry:true});});}
   if(ME&&s.ritme!==2){s.tasks=ritmeJanick().concat(s.tasks.filter(function(t){return !/^j\d+$/.test(t.id);}));s.ritme=2;}
   Object.keys(d).forEach(function(k){if(s[k]===undefined||s[k]===null&&k!=='defaultLunch')s[k]=d[k];});
   ['menu','energy','settings','shop','wash','thesis','log','clean','roomPlan','jar'].forEach(function(k){if(typeof s[k]!=='object'||Array.isArray(s[k]))s[k]=d[k];});
@@ -1242,6 +1243,7 @@ function itemsFor(k){
     if(task.date){
       if(isToday){
         if(task.date>t)return;
+        if(task.noCarry&&task.date<t)return;
         if(task.doneOn&&task.doneOn!==t)return;
         it.done=task.doneOn===t;
         if(task.date<t&&!it.done)it.carried=true;
