@@ -631,6 +631,50 @@ button.tile,.tile>.tmain{gap:4px;padding:10px 12px 10px 16px;min-height:58px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 body.solo .tabs{display:none}
 body.solo .app{padding-bottom:40px}
+
+/* ===== het huis ===== */
+.hhero{padding:4px 2px 6px}
+.hhero h1{margin-top:2px}
+.hhero .lede{color:var(--ink-2);margin-top:4px}
+.housewrap{margin:6px -12px 14px}
+.housesvg{display:block;width:100%;height:auto;overflow:visible}
+.hroom,.hgate{cursor:pointer;outline:none}
+.hroom .hhit{transition:fill .15s}
+.hroom:active .hhit,.hgate:active rect:last-child{fill:rgba(255,255,255,.18)}
+.hroom:focus-visible .hhit{stroke:var(--accent);stroke-width:3}
+.hlbl{font:800 9.5px var(--font-body);fill:#5B4A3F;letter-spacing:.02em;paint-order:stroke;stroke:rgba(255,255,255,.75);stroke-width:2.6px;stroke-linejoin:round}
+.hbadge{font:800 10px var(--font-body);fill:#fff}
+.hglow{animation:hglow 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes hglow{0%,100%{opacity:.85}50%{opacity:1}}
+.hspin{animation:hspin 1.6s linear infinite}
+@keyframes hspin{to{transform:rotate(360deg)}}
+.hsteam{animation:hsteam 2.6s ease-in-out infinite}
+@keyframes hsteam{0%,100%{opacity:.25;transform:translateY(1px)}50%{opacity:.9;transform:translateY(-2px)}}
+.hsmoke{animation:hsteam 4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.hglow,.hspin,.hsteam,.hsmoke{animation:none}}
+.brand.hback{border:0;background:none;padding:6px 8px 6px 0;min-height:40px;font:600 16px var(--font-body);color:var(--accent)}
+.hevs{display:flex;flex-direction:column;gap:6px}
+.hev{display:flex;gap:10px;align-items:baseline;text-align:left;border:0;background:var(--sunk);border-radius:12px;padding:10px 12px;min-height:44px;color:var(--ink)}
+.hevd{font:700 13px var(--font-body);color:var(--accent);white-space:nowrap}
+.hevt{font:400 15px var(--font-body)}
+.hlist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.hsec{font:700 12px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:18px 2px -4px}
+.hrow{position:relative;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 24%,var(--surface)) calc(var(--p,0) * 100%),var(--sunk) 0)}
+.hrow.later{opacity:.72}
+.hmain{flex:1;display:flex;align-items:center;gap:12px;border:0;background:none;text-align:left;padding:12px 6px 12px 14px;min-height:56px;color:var(--ink)}
+.hrow .check{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid color-mix(in srgb,var(--accent) 55%,var(--line));display:grid;place-items:center;color:#fff;background:var(--surface)}
+.hrow .check svg{opacity:0}
+.hrow .check.on,.hrow.popped .check{background:var(--accent);border-color:var(--accent)}
+.hrow .check.on svg,.hrow.popped .check svg{opacity:1}
+.hrow.popped .txt,.hrow.isdone .txt{text-decoration:line-through;color:var(--ink-2)}
+.hrow .p{background:var(--accent)}
+.htxt{display:flex;flex-direction:column;gap:2px}
+.htxt b{font:400 16.5px var(--font-body)}
+.htxt small{font:400 13px var(--font-body);color:var(--ink-2)}
+.hedit{flex:none;width:48px;border:0;background:none;color:var(--ink-2);display:grid;place-items:center}
+.hinfo{background:var(--sunk);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:15px;line-height:1.5}
+.hinfo .rowbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 </style>
 
 <div class="app" id="app"></div>
@@ -645,6 +689,7 @@ body.solo .app{padding-bottom:40px}
 /* ================= vaste gegevens ================= */
 var PROFILE=(function(){try{return localStorage.getItem('huisritme-profiel')==='janick'?'janick':'mirey';}catch(e){return 'mirey';}})();
 var ME=PROFILE==='janick';
+var HOUSE=!ME;
 var KEY=ME?'huisritme-v2-janick':'huisritme-v2';
 var CATS={kinderen:'Kinderen',was:'Was',schoon:'Schoonmaken',koken:'Koken',lunch:'Lunch',boodschappen:'Boodschappen',thesis:'Thesis',eigen:'Eigen',rust:'Rust',bewegen:'Bewegen',zorg:'Zelfzorg'};
 var CAT_ORDER=ME?['zorg','rust','bewegen','koken','kinderen','eigen']:['kinderen','schoon','koken','lunch','boodschappen','was','eigen'];
@@ -1174,7 +1219,7 @@ function upcomingReminders(){
   var t=today(),now=Date.now(),out=[];
   for(var i=0;i<8;i++){
     var k=addDays(t,i);
-    S.tasks.forEach(function(task){
+    (HOUSE?[]:S.tasks).forEach(function(task){
       if(!task.remind||!occursOn(task,k))return;
       if(i===0&&!task.date&&LR(t).done[task.id])return;
       var at=tsOf(k,task.remind);
@@ -1225,7 +1270,7 @@ function checkInApp(){
   var fired=firedSet(),now=Date.now(),changed=false;
   /* herinneringen die in de afgelopen 2 minuten vielen */
   var cand=[],t=today();
-  S.tasks.forEach(function(task){if(task.remind&&occursOn(task,t)&&!(!task.date&&LR(t).done[task.id])){var at=tsOf(t,task.remind);cand.push({key:'t:'+task.id+':'+t,at:at,title:taskTitle(task,t)});}});
+  (HOUSE?[]:S.tasks).forEach(function(task){if(task.remind&&occursOn(task,t)&&!(!task.date&&LR(t).done[task.id])){var at=tsOf(t,task.remind);cand.push({key:'t:'+task.id+':'+t,at:at,title:taskTitle(task,t)});}});
   [t,addDays(t,1)].forEach(function(k){S.events.forEach(function(e){if(e.remind&&e.remind!=='none'&&eventOn(e,k)){var at=eventRemindAt(e,k);if(at)cand.push({key:'e:'+e.id+':'+k,at:at,title:e.title+(e.time?' om '+e.time:'')});}});});
   cand.forEach(function(c){
     if(c.at<=now&&now-c.at<120000&&!fired[c.key]){fired[c.key]=now;changed=true;ensureAudio();plink();buzz();toast('Herinnering: '+c.title);}
@@ -1328,7 +1373,7 @@ function dayProgress(){
   return {done:d,total:its.length,pct:its.length?d/its.length:0};
 }
 function syncDayCoins(strict){
-  if(!S.jar||!S.jar.on)return null;
+  if(!S.jar||!S.jar.on||HOUSE)return null;
   var pr=dayProgress(),lg=LR(),got=null,keep=lastEarn;
   TIERS.forEach(function(t){
     var has=!!(lg.coins&&lg.coins[t[0]]),ok=pr.total>=2&&pr.pct>=t[1]-1e-9;
@@ -1341,7 +1386,7 @@ function syncDayCoins(strict){
 function tierEarned(){var c=LR().coins||{},n=0;TIERS.forEach(function(t){n+=c[t[0]]||0;});return n;}
 function lastTended(){
   var ks=Object.keys(S.log).sort().reverse();
-  for(var i=0;i<ks.length;i++){var c=S.log[ks[i]].coins;if(c&&c.day50)return ks[i];}
+  for(var i=0;i<ks.length;i++){var c=S.log[ks[i]].coins;if(c&&(HOUSE?Object.keys(c).length:c.day50))return ks[i];}
   return S.jar.started||today();
 }
 function wilt(){var d=diffDays(lastTended(),today());return d<=1?0:Math.min(3,d-1);}
@@ -1435,7 +1480,7 @@ function earnMsg(){
   if(!lastEarn||!lastEarn.amt)return '';
   if(lastEarn.goal)return ' · je tuin staat in volle bloei!';
   if(lastEarn.bloom)return ' · er bloeit een nieuwe bloem!';
-  return ' · extra druppel voor je tuin';
+  return HOUSE?' · een druppel voor je tuin':' · extra druppel voor je tuin';
 }
 function tierMsg(t,bon){
   var m=t.label+'! Je tuin krijgt water';
@@ -1450,11 +1495,13 @@ function complete(id){
     var lid=id.slice(5),l;
     if(lid==='new'){l={id:uid(),name:'Was',step:0};S.loads.push(l);}
     else l=findLoad(lid);
-    if(l)advanceLoad(l);
+    if(l){if(HOUSE)earn('wash:'+l.id+':'+l.step,0,'',1);advanceLoad(l);}
     delete lg.moved[id];delete lg.skip[id];
     return;
   }
   if(id==='thesis'){lg.done.thesis=true;earn('thesis',0,'',1);return;}
+  if(id.indexOf('h:')===0){var ht=hTask(id.slice(2));if(ht){ht.last=t;delete ht.seed;earn(id,0,'',1);}return;}
+  if(HOUSE&&id.indexOf('prep-')===0){lg.done[id]=true;earn(id,0,'',1);return;}
   var task=findTask(id);
   lastEarn=null;if(task&&task.date)earn(id+':extra',0,'',1);
   if(task&&task.date)task.doneOn=t;else lg.done[id]=true;
@@ -1471,11 +1518,11 @@ function startThesis(){
 }
 
 /* ================= weergaven ================= */
-var tab='dag',agendaDay=today(),etenView='menu',sheet=null,thesisAnnounced=null;
+var tab=HOUSE?'huis':'dag',agendaDay=today(),etenView='menu',sheet=null,thesisAnnounced=null;
 var appEl=document.getElementById('app'),tabsEl=document.getElementById('tabs'),sheetEl=document.getElementById('sheet');
 
 function header(){
-  return '<header class="top"><span class="brand">Huisritme</span><span class="right">'+(tab==='dag'?'':'<span class="date">'+esc(dateStr())+'</span>')+
+  return '<header class="top"><span class="brand">Huisritme</span><span class="right">'+(tab==='dag'||tab==='huis'?'':'<span class="date">'+esc(dateStr())+'</span>')+
     (S.jar.on?'<button class="coinpill" data-act="jar" aria-label="Tuintje: '+blooming()+' van '+S.jar.size+' bloemen">'+FLOWER+blooming()+'/'+S.jar.size+'</button>':'')+'<button class="iconbtn" data-act="settings" aria-label="Instellingen">'+GEAR+'</button></span></header>';
 }
 function sessionCard(){
@@ -1803,6 +1850,316 @@ function sheetRoom(sh){
     '<div class="fgroup"><label class="flabel" for="roomChores">Wat doe je daar?</label><input class="field" id="roomChores" type="text" value="'+esc(p.chores)+'" placeholder="Bijvoorbeeld: stofzuigen en ramen"><span class="fhelp">Dit staat in je agenda als deze kamer aan de beurt is.</span></div>'+
     '<div class="sheetbtns one"><button class="btn primary sm" data-act="roomsave" data-id="'+r.id+'">Opslaan</button></div>';
 }
+/* ================= Het huis (Mirey) ================= */
+var HFREQ=[[1,'Elke dag'],[2,'Om de dag'],[3,'Twee keer per week'],[7,'Elke week'],[14,'Om de week'],[30,'Elke maand']];
+function freqLabel(n){var f=HFREQ.filter(function(x){return x[0]===n;})[0];return f?f[1].toLowerCase():'elke '+n+' dagen';}
+var HOUSE_DEFAULT={
+  keuken:[['Vaatwasser uitruimen',1,5],['Aanrecht en fornuis afnemen',2,5],['Koelkast nalopen',7,10]],
+  woon:[['Even opruimen',2,10],['Stofzuigen',7,15]],
+  gang:[['Schoenen en jassen opruimen',7,5],['Stofzuigen en dweilen',14,15]],
+  wc:[['Wc schoonmaken',7,10]],
+  overloop:[['Stofzuigen',14,10]],
+  bad:[['Wastafel en spiegel',7,10],['Douche en bad',14,15]],
+  onze:[['Bed verschonen',14,10],['Stofzuigen',14,10]],
+  avelie:[['Speelgoed opruimen',3,10],['Bed verschonen',14,10]],
+  sera:[['Speelgoed opruimen',3,10],['Bed verschonen',14,10]],
+  gast:[['Afstoffen en luchten',30,10]],
+  was:[['Machine en filter schoonmaken',30,10]]
+};
+var HNAME={was:'Washok',gast:'Gastenkamer',overloop:'Overloop',bad:'Badkamer',onze:'Onze kamer',avelie:'Avelie',sera:'Sera',keuken:'Keuken',woon:'Woonkamer',gang:'Gang',wc:'Wc'};
+var HLONG={avelie:'Kamer van Avelie',sera:'Kamer van Sera'};
+function hName(id){return HLONG[id]||HNAME[id]||id;}
+function migrateHouse(){
+  var out=[];
+  Object.keys(HOUSE_DEFAULT).forEach(function(r){HOUSE_DEFAULT[r].forEach(function(x,i){
+    var t={id:'h-'+r+'-'+i,room:r,text:x[0],every:x[1],min:x[2],last:null};
+    var fr=((out.length*0.618)%1)*1.15;t.last=addDays(today(),-Math.floor(x[1]*fr));t.seed=true;
+    if(x[1]>=7&&S.clean&&S.clean[r])t.last=S.clean[r];
+    out.push(t);
+  });});
+  /* bestaande schoonmaaktaken overnemen in de kamer waar ze horen */
+  (S.tasks||[]).forEach(function(t){
+    if(t.kind||t.date||!t.text)return;
+    var rs=roomsOf(t.text);if(rs.length!==1)return;
+    var fw=function(x){return norm(x).split(' ')[0];};
+    if(out.some(function(o){return o.room===rs[0]&&(norm(o.text)===norm(t.text)||fw(o.text)===fw(t.text));}))return;
+    var ev=!t.days||!t.days.length||t.days.length>=7?1:Math.max(1,Math.round(7/t.days.length));
+    out.push({id:'hm-'+t.id,room:rs[0],text:t.text,every:ev,min:t.min||10,last:addDays(today(),-Math.floor(ev*((out.length*0.618)%1)*1.15)),seed:true});
+  });
+  S.house=out;S.setupDone=true;save();
+}
+function hTask(id){return (S.house||[]).filter(function(x){return x.id===id;})[0]||null;}
+function hDue(t){return !t.last||diffDays(t.last,today())>=t.every;}
+function hLeft(t){return t.last?t.every-diffDays(t.last,today()):0;}
+function prepToday(){
+  var tm=addDays(today(),1),dt=dinnerFor(tm);
+  if(!dt||typeof dt!=='object'||!dt.prep)return null;
+  var id='prep-'+tm;
+  return {id:id,text:'Voor morgen: '+dt.prep.charAt(0).toLowerCase()+dt.prep.slice(1),done:!!LR().done[id]};
+}
+function loadReady(l){
+  if(l.step===0)return !inMachine();
+  if(l.step===1)return !l.endsAt||Date.now()>=l.endsAt;
+  return true;
+}
+function roomCount(r){
+  var n=(S.house||[]).filter(function(t){return t.room===r&&hDue(t);}).length;
+  if(r==='keuken'){var p=prepToday();if(p&&!p.done)n++;}
+  if(r==='was')n+=S.loads.filter(loadReady).length;
+  return n;
+}
+
+/* --- tekening --- */
+var HGEO=[
+  {id:'was',x:24,y:34,w:156,h:108,attic:1},
+  {id:'gast',x:180,y:34,w:156,h:108,attic:1},
+  {id:'overloop',x:12,y:148,w:50,h:94},{id:'bad',x:62,y:148,w:66,h:94},{id:'onze',x:128,y:148,w:82,h:94},{id:'avelie',x:210,y:148,w:68,h:94},{id:'sera',x:278,y:148,w:70,h:94},
+  {id:'keuken',x:12,y:242,w:98,h:98},{id:'woon',x:110,y:242,w:118,h:98},{id:'gang',x:228,y:242,w:66,h:98},{id:'wc',x:294,y:242,w:54,h:98}
+];
+var HWALL={was:'#EDE4D3',gast:'#E7E2F0',overloop:'#EFE5D7',bad:'#DDEDEF',onze:'#F3E2DC',avelie:'#F8DFE7',sera:'#F6EBC9',keuken:'#E6EFDD',woon:'#F4E7D6',gang:'#ECE6DA',wc:'#DCE8F0'};
+var HTILE={bad:1,wc:1,keuken:1,was:1};
+var INK='#5B4A3F';
+function hs(extra){return 'stroke="'+INK+'" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"'+(extra||'');}
+function furn(id,x,y,w,h){
+  var f=y+h-12,o='';
+  switch(id){
+    case 'was':
+      var run=inMachine(),busyM=run&&run.endsAt&&Date.now()<run.endsAt;
+      o+='<rect x="'+(x+118)+'" y="'+(f-34)+'" width="30" height="34" rx="3" fill="#F6F3EC" '+hs()+'/><path d="M'+(x+118)+' '+(f-27)+'h30" '+hs()+'/><circle cx="'+(x+124)+'" cy="'+(f-30.5)+'" r="1.4" fill="'+INK+'"/>';
+      o+='<circle cx="'+(x+133)+'" cy="'+(f-13)+'" r="9" fill="'+(run?'#8EC3D6':'#DCE9EE')+'" '+hs()+'/>';
+      if(run)o+='<g class="'+(busyM?'hspin':'')+'" style="transform-origin:'+(x+133)+'px '+(f-13)+'px"><path d="M'+(x+127)+' '+(f-12)+'q3 -5 6 0t6 0" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="'+(x+131)+'" cy="'+(f-16)+'" r="1.6" fill="#fff"/></g>';
+      o+='<path d="M'+(x+90)+' '+(f-16)+'h22l-3 16h-16z" fill="#D9B88A" '+hs()+'/><path d="M'+(x+93)+' '+(f-10)+'h16M'+(x+94)+' '+(f-5)+'h14" stroke="#B48F5F" stroke-width="1"/>';
+      if(S.loads.some(function(l){return l.step===0;}))o+='<path d="M'+(x+92)+' '+(f-16)+'q5 -6 9 -1q4 -5 9 1z" fill="#E98FAE" '+hs()+'/>';
+      o+='<path d="M'+(x+122)+' '+(f-50)+'h30" stroke="'+INK+'" stroke-width="2"/><rect x="'+(x+126)+'" y="'+(f-61)+'" width="7" height="11" rx="2" fill="#7FB3D5" '+hs()+'/><rect x="'+(x+137)+'" y="'+(f-58)+'" width="9" height="8" rx="1.5" fill="#F2C14E" '+hs()+'/>';
+      break;
+    case 'gast':
+      o+='<rect x="'+(x+8)+'" y="'+(f-24)+'" width="5" height="24" rx="1.5" fill="#B98B66" '+hs()+'/><rect x="'+(x+12)+'" y="'+(f-13)+'" width="40" height="9" rx="2" fill="#FBF7F0" '+hs()+'/><path d="M'+(x+26)+' '+(f-13)+'h26v7h-26z" fill="#9AA7D6" '+hs()+'/><ellipse cx="'+(x+19)+'" cy="'+(f-15)+'" rx="6" ry="3" fill="#fff" '+hs()+'/><path d="M'+(x+14)+' '+(f-4)+'v4M'+(x+50)+' '+(f-4)+'v4" '+hs()+'/>';
+      o+='<rect x="'+(x+60)+'" y="'+(f-22)+'" width="40" height="3.5" rx="1" fill="#C59A70" '+hs()+'/><path d="M'+(x+63)+' '+(f-18.5)+'v18.5M'+(x+97)+' '+(f-18.5)+'v18.5" '+hs()+'/>';
+      o+='<path d="M'+(x+70)+' '+(f-22)+'l3 -11h16l3 11z" fill="#4F5BA3" '+hs()+'/><rect x="'+(x+76)+'" y="'+(f-30)+'" width="10" height="5" rx="1" fill="#B9C2EE"/>';
+      o+='<rect x="'+(x+91)+'" y="'+(f-29)+'" width="5" height="7" rx="1" fill="#F6E6C8" '+hs()+'/>';
+      if(S.thesis&&S.thesis.session)o+='<circle cx="'+(x+93.5)+'" cy="'+(f-31)+'" r="1.4" fill="#F2C14E"/>';
+      break;
+    case 'overloop':
+      for(var i=0;i<5;i++)o+='<rect x="'+(x+4+i*8)+'" y="'+(f-(i+1)*9)+'" width="'+(w-8-i*8)+'" height="9" fill="'+(i%2?'#C99C72':'#D7AE84')+'" '+hs()+'/>';
+      o+='<path d="M'+(x+5)+' '+(f-14)+'L'+(x+42)+' '+(f-58)+'" stroke="'+INK+'" stroke-width="1.8"/>';
+      for(var j=0;j<4;j++)o+='<path d="M'+(x+10+j*9)+' '+(f-20-j*10.5)+'v10" '+hs()+'/>';
+      o+='<path d="M'+(x+10)+' '+(f-70)+'h16v12h-16z" fill="#F7EFE3" '+hs()+'/><path d="M'+(x+13)+' '+(f-61)+'l4 -5l3 3l3 -4l2 6z" fill="#9BBF7A"/>';
+      break;
+    case 'bad':
+      o+='<path d="M'+(x+4)+' '+(f-16)+'h36v6a8 8 0 0 1 -8 8h-20a8 8 0 0 1 -8 -8z" fill="#FFFFFF" '+hs()+'/><path d="M'+(x+9)+' '+(f-2)+'l-2 3M'+(x+35)+' '+(f-2)+'l2 3" '+hs()+'/>';
+      o+='<path d="M'+(x+8)+' '+(f-16)+'q3 -3 6 0q3 -3 6 0q3 -3 6 0q3 -3 6 0q3 -3 6 0" fill="#CFE6F0" '+hs()+'/>';
+      o+='<path d="M'+(x+8)+' '+(f-16)+'v-40h6" fill="none" '+hs()+'/><path d="M'+(x+12)+' '+(f-58)+'h8l-2 4h-4z" fill="#B9C9D3" '+hs()+'/>';
+      o+='<ellipse cx="'+(x+53)+'" cy="'+(f-48)+'" rx="7" ry="9" fill="#EAF4F7" '+hs()+'/><path d="M'+(x+50)+' '+(f-52)+'l3 -3" stroke="#fff" stroke-width="1.5"/>';
+      o+='<path d="M'+(x+45)+' '+(f-30)+'h16l-2 6h-12z" fill="#fff" '+hs()+'/><path d="M'+(x+53)+' '+(f-24)+'v24" stroke="'+INK+'" stroke-width="2"/>';
+      break;
+    case 'onze':
+      o+='<rect x="'+(x+6)+'" y="'+(f-30)+'" width="7" height="30" rx="2" fill="#A97C5A" '+hs()+'/><rect x="'+(x+12)+'" y="'+(f-15)+'" width="58" height="10" rx="2.5" fill="#FBF7F0" '+hs()+'/>';
+      o+='<path d="M'+(x+30)+' '+(f-16)+'h40v11h-40z" fill="#C97B84" '+hs()+'/><path d="M'+(x+30)+' '+(f-12)+'h40" stroke="#E3A3AA" stroke-width="1.2"/>';
+      o+='<ellipse cx="'+(x+20)+'" cy="'+(f-17)+'" rx="7" ry="3.4" fill="#fff" '+hs()+'/><ellipse cx="'+(x+22)+'" cy="'+(f-20)+'" rx="6" ry="3" fill="#F7EFE3" '+hs()+'/><path d="M'+(x+14)+' '+(f-5)+'v5M'+(x+68)+' '+(f-5)+'v5" '+hs()+'/>';
+      o+='<rect x="'+(x+30)+'" y="'+(f-56)+'" width="22" height="16" rx="1.5" fill="#F6EBD6" '+hs()+'/><path d="M'+(x+32)+' '+(f-42)+'l6 -7l4 4l4 -6l4 9z" fill="#9BBF7A"/>';
+      break;
+    case 'avelie': case 'sera':
+      var bl=id==='avelie'?'#E99AB5':'#F2C14E',bl2=id==='avelie'?'#F5C3D4':'#F8DC8A';
+      o+='<rect x="'+(x+5)+'" y="'+(f-22)+'" width="5" height="22" rx="1.5" fill="#E8D3BC" '+hs()+'/><rect x="'+(x+9)+'" y="'+(f-12)+'" width="38" height="8" rx="2" fill="#FBF7F0" '+hs()+'/>';
+      o+='<path d="M'+(x+21)+' '+(f-13)+'h26v9h-26z" fill="'+bl+'" '+hs()+'/><circle cx="'+(x+29)+'" cy="'+(f-9)+'" r="1.3" fill="'+bl2+'"/><circle cx="'+(x+38)+'" cy="'+(f-7)+'" r="1.3" fill="'+bl2+'"/>';
+      o+='<ellipse cx="'+(x+15)+'" cy="'+(f-14)+'" rx="5" ry="2.6" fill="#fff" '+hs()+'/><path d="M'+(x+11)+' '+(f-4)+'v4M'+(x+45)+' '+(f-4)+'v4" '+hs()+'/>';
+      if(id==='avelie'){
+        o+='<path d="M'+(x+6)+' '+(f-62)+'q28 10 56 0" fill="none" '+hs()+'/>';
+        ['#E99AB5','#9AA7D6','#F2C14E','#9BBF7A','#E99AB5'].forEach(function(c,k){var px=x+12+k*11,py=f-62+Math.sin((k+.5)/5*Math.PI)*4.5;o+='<path d="M'+(px-3.5)+' '+py+'h7l-3.5 7z" fill="'+c+'" '+hs()+'/>';});
+        o+='<circle cx="'+(x+55)+'" cy="'+(f-9)+'" r="6" fill="#C79A6E" '+hs()+'/><circle cx="'+(x+55)+'" cy="'+(f-18)+'" r="4.6" fill="#C79A6E" '+hs()+'/><circle cx="'+(x+51.5)+'" cy="'+(f-22)+'" r="1.8" fill="#C79A6E" '+hs()+'/><circle cx="'+(x+58.5)+'" cy="'+(f-22)+'" r="1.8" fill="#C79A6E" '+hs()+'/>';
+      }else{
+        [[14,-60,3.2],[30,-66,2.4],[46,-58,3],[58,-68,2.2],[22,-48,2]].forEach(function(s){var cx=x+s[0],cy=f+s[1],r=s[2];o+='<path d="M'+cx+' '+(cy-r*1.6)+'l'+(r*.45)+' '+(r)+'l'+(r*1.1)+' '+(r*.15)+'l'+(-r*.85)+' '+(r*.7)+'l'+(r*.3)+' '+(r*1.1)+'l'+(-r)+' '+(-r*.6)+'l'+(-r)+' '+(r*.6)+'l'+(r*.3)+' '+(-r*1.1)+'l'+(-r*.85)+' '+(-r*.7)+'l'+(r*1.1)+' '+(-r*.15)+'z" fill="#F2C14E" '+hs()+'/>';});
+        o+='<ellipse cx="'+(x+52)+'" cy="'+(f+1)+'" rx="12" ry="2.6" fill="#B7A2E6" opacity=".8"/>';
+      }
+      break;
+    case 'keuken':
+      o+='<rect x="'+(x+5)+'" y="'+(f-24)+'" width="64" height="24" rx="1.5" fill="#A9C3A0" '+hs()+'/><path d="M'+(x+3)+' '+(f-24)+'h68" stroke="'+INK+'" stroke-width="2.4"/>';
+      o+='<path d="M'+(x+26)+' '+(f-20)+'v18M'+(x+48)+' '+(f-20)+'v18" '+hs()+'/><circle cx="'+(x+22)+'" cy="'+(f-11)+'" r="1.1" fill="'+INK+'"/><circle cx="'+(x+30)+'" cy="'+(f-11)+'" r="1.1" fill="'+INK+'"/><circle cx="'+(x+52)+'" cy="'+(f-11)+'" r="1.1" fill="'+INK+'"/>';
+      o+='<path d="M'+(x+36)+' '+(f-26)+'h14v-7h-14z" fill="#C4523A" '+hs()+'/><path d="M'+(x+50)+' '+(f-31)+'h6" '+hs()+'/>';
+      var dn=dinnerFor(today());if(dn&&typeof dn==='object')o+='<path class="hsteam" d="M'+(x+40)+' '+(f-36)+'q-3 -4 0 -8M'+(x+46)+' '+(f-36)+'q3 -4 0 -8" fill="none" stroke="#B9A99A" stroke-width="1.3" stroke-linecap="round"/>';
+      o+='<rect x="'+(x+8)+'" y="'+(f-66)+'" width="44" height="16" rx="1.5" fill="#BFD3B6" '+hs()+'/><path d="M'+(x+30)+' '+(f-66)+'v16" '+hs()+'/>';
+      o+='<rect x="'+(x+74)+'" y="'+(f-54)+'" width="20" height="54" rx="3" fill="#EEF2F2" '+hs()+'/><path d="M'+(x+74)+' '+(f-34)+'h20M'+(x+78)+' '+(f-46)+'v6M'+(x+78)+' '+(f-28)+'v8" '+hs()+'/>';
+      if(shopLeft())o+='<rect x="'+(x+81)+'" y="'+(f-50)+'" width="9" height="11" rx="1" fill="#FFF6B8" '+hs()+' transform="rotate(6 '+(x+85)+' '+(f-45)+')"/>';
+      break;
+    case 'woon':
+      o+='<ellipse cx="'+(x+52)+'" cy="'+(f+2)+'" rx="40" ry="4" fill="#E2B8A0" opacity=".8"/>';
+      o+='<path d="M'+(x+18)+' '+(f-26)+'h68a5 5 0 0 1 5 5v10h-78v-10a5 5 0 0 1 5 -5z" fill="#7C9CC0" '+hs()+'/><rect x="'+(x+11)+'" y="'+(f-18)+'" width="82" height="14" rx="4" fill="#8FAED0" '+hs()+'/>';
+      o+='<path d="M'+(x+52)+' '+(f-18)+'v14" '+hs()+'/><path d="M'+(x+15)+' '+(f-4)+'v4M'+(x+89)+' '+(f-4)+'v4" '+hs()+'/><rect x="'+(x+22)+'" y="'+(f-24)+'" width="12" height="9" rx="3" fill="#F2C14E" '+hs()+' transform="rotate(-10 '+(x+28)+' '+(f-20)+')"/>';
+      o+='<rect x="'+(x+30)+'" y="'+(f-60)+'" width="18" height="14" rx="1.5" fill="#F6EBD6" '+hs()+'/><circle cx="'+(x+39)+'" cy="'+(f-53)+'" r="3.5" fill="#E98FAE"/><rect x="'+(x+56)+'" y="'+(f-58)+'" width="13" height="17" rx="1.5" fill="#F6EBD6" '+hs()+'/><path d="M'+(x+58)+' '+(f-44)+'l4 -6l5 6z" fill="#9BBF7A"/>';
+      o+='<path d="M'+(x+104)+' '+(f)+'v-40" stroke="'+INK+'" stroke-width="1.6"/><path d="M'+(x+97)+' '+(f-40)+'h14l-3 -9h-8z" fill="#F7E2B8" '+hs()+'/><path d="M'+(x+100)+' '+f+'h8" '+hs()+'/>';
+      o+='<path d="M'+(x+2)+' '+(f)+'h8l-1.5 -9h-5z" fill="#C98D6A" '+hs()+'/><path d="M'+(x+6)+' '+(f-9)+'q-6 -10 -1 -16M'+(x+6)+' '+(f-9)+'q4 -12 3 -18M'+(x+6)+' '+(f-9)+'q8 -6 6 -12" fill="none" stroke="#6FAE6A" stroke-width="2.4" stroke-linecap="round"/>';
+      break;
+    case 'gang':
+      o+='<rect x="'+(x+24)+'" y="'+(f-50)+'" width="26" height="50" rx="2" fill="#6F8FA6" '+hs()+'/><rect x="'+(x+29)+'" y="'+(f-45)+'" width="16" height="13" rx="6" fill="#DCEBF2" '+hs()+'/><circle cx="'+(x+45)+'" cy="'+(f-22)+'" r="1.5" fill="#F2C14E"/>';
+      o+='<path d="M'+(x+6)+' '+(f-52)+'h14" stroke="'+INK+'" stroke-width="2"/><path d="M'+(x+8)+' '+(f-52)+'l-2 22h8l-2 -22z" fill="#C97B84" '+hs()+'/><path d="M'+(x+16)+' '+(f-52)+'l-1 16h6l-1 -16z" fill="#E3A956" '+hs()+'/>';
+      o+='<path d="M'+(x+5)+' '+f+'l3 -4h6v4zM'+(x+15)+' '+f+'l2 -3h5v3z" fill="#7A5A48"/>';
+      var evToday=eventsOn(today()).length;
+      o+='<rect x="'+(x+53)+'" y="'+(f-60)+'" width="10" height="12" rx="1" fill="#fff" '+hs()+'/><rect x="'+(x+53)+'" y="'+(f-60)+'" width="10" height="3.5" fill="#C4523A"/>'+(evToday?'<circle cx="'+(x+58)+'" cy="'+(f-52)+'" r="1.8" fill="#C4523A"/>':'');
+      break;
+    case 'wc':
+      o+='<rect x="'+(x+8)+'" y="'+(f-34)+'" width="12" height="15" rx="2" fill="#fff" '+hs()+'/><path d="M'+(x+6)+' '+(f-19)+'h22a2 2 0 0 1 0 4h-2q-2 9 -9 9h-4v6h-6v-15z" fill="#fff" '+hs()+'/>';
+      o+='<path d="M'+(x+34)+' '+(f-38)+'h14l-2 5h-10z" fill="#fff" '+hs()+'/><path d="M'+(x+41)+' '+(f-33)+'v8" stroke="'+INK+'" stroke-width="1.6"/><circle cx="'+(x+42)+'" cy="'+(f-14)+'" r="3.4" fill="#fff" '+hs()+'/><path d="M'+(x+38)+' '+(f-17.5)+'h4" '+hs()+'/>';
+      break;
+  }
+  return o;
+}
+function houseSVG(){
+  var night=daypart()==='night'||daypart()==='dusk';
+  var o='<svg class="housesvg" viewBox="0 0 360 400" role="group" aria-label="Jullie huis. Tik op een kamer.">';
+  o+='<defs><radialGradient id="hglow"><stop offset="0" stop-color="#FFE3A3" stop-opacity=".95"/><stop offset=".45" stop-color="#FFD58A" stop-opacity=".45"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>'+
+    '<clipPath id="hattic"><path d="M24 142L180 34L336 142z"/></clipPath>'+
+    '<pattern id="htiles" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#E4DED3"/><path d="M0 0h8v8" fill="none" stroke="#CFC6B8" stroke-width=".8"/></pattern>'+
+    '<pattern id="hwood" width="22" height="6" patternUnits="userSpaceOnUse"><rect width="22" height="6" fill="#CFA57B"/><path d="M0 6h22M14 0v6" stroke="#B88C63" stroke-width=".8"/></pattern></defs>';
+  /* tuintje om het huis */
+  o+='<path d="M0 352q90 -10 180 -4t180 -4v56h-360z" fill="#A8C68A"/><path d="M0 366q100 -8 200 -2t160 -4v40h-360z" fill="#97BA7A"/>';
+  o+='<g data-act="jar" role="button" tabindex="0" aria-label="Naar je tuin" class="hgate"><path d="M300 400q10 -24 14 -50" stroke="#E2CFA9" stroke-width="12" fill="none" stroke-linecap="round"/>'+
+    '<path d="M318 350v-22M346 350v-22" stroke="#7A5A48" stroke-width="2.2"/><path d="M318 334h28M318 344h28" stroke="#9C7A5E" stroke-width="2"/>'+
+    '<g fill="#E98FAE"><circle cx="314" cy="356" r="3"/><circle cx="352" cy="357" r="3"/></g><g fill="#F2C14E"><circle cx="322" cy="360" r="2.4"/><circle cx="346" cy="362" r="2.4"/></g>'+
+    '<rect x="309" y="372" width="34" height="15" rx="7.5" fill="#FBF6EC" stroke="#7A5A48" stroke-width="1"/><text x="326" y="383" text-anchor="middle" class="hlbl" style="font-size:9.5px">Tuin</text>'+
+    '<rect x="296" y="320" width="64" height="72" fill="transparent"/></g>';
+  o+='<g fill="#7FB06B"><circle cx="16" cy="352" r="9"/><circle cx="28" cy="356" r="7"/></g><g fill="#E98FAE"><circle cx="40" cy="357" r="2.6"/><circle cx="60" cy="359" r="2.2"/></g><g fill="#F2C14E"><circle cx="50" cy="360" r="2.2"/></g>';
+  /* huis: schoorsteen, dak, buitenmuren */
+  o+='<rect x="258" y="40" width="20" height="54" fill="#9E5E48" stroke="#5B3A2E" stroke-width="1.4"/><rect x="255" y="36" width="26" height="7" rx="1" fill="#7E4A39" stroke="#5B3A2E" stroke-width="1.4"/>';
+  if(night)o+='<path class="hsmoke" d="M268 32q-6 -8 0 -14t0 -14" fill="none" stroke="#C9C2B8" stroke-width="3" stroke-linecap="round" opacity=".6"/>';
+  o+='<path d="M0 150L180 14L360 150z" fill="#8A5A47" stroke="#5B3A2E" stroke-width="1.6" stroke-linejoin="round"/>';
+  for(var yy=28;yy<150;yy+=12){var hf=(yy-14)*180/136;o+='<path d="M'+(180-hf).toFixed(1)+' '+yy+'H'+(180+hf).toFixed(1)+'" stroke="#74493A" stroke-width="1"/>';}
+  o+='<path d="M24 142L180 34L336 142z" fill="#6F4636"/>';
+  o+='<rect x="8" y="144" width="344" height="200" fill="#B9765F" stroke="#5B3A2E" stroke-width="1.6"/>';
+  o+='<path d="M8 344h344v6h-344z" fill="#7A5A48"/>';
+  /* kamers */
+  var lit=0;
+  HGEO.forEach(function(g){
+    var n=roomCount(g.id);if(n)lit++;
+    var x=g.x+2,y=g.y+2,w=g.w-4,h=g.h-4,f=y+h-12;
+    var lab=hName(g.id),aria=lab+(n?', '+n+(n===1?' ding':' dingen')+' te doen':', niets te doen');
+    o+='<g class="hroom'+(n?' lit':'')+'" data-act="hroom" data-id="'+g.id+'" role="button" tabindex="0" aria-label="'+esc(aria)+'"'+(g.attic?' clip-path="url(#hattic)"':'')+'>';
+    o+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+HWALL[g.id]+'"/>';
+    o+='<rect x="'+x+'" y="'+f+'" width="'+w+'" height="12" fill="url(#'+(HTILE[g.id]?'htiles':'hwood')+')"/><path d="M'+x+' '+f+'h'+w+'" stroke="'+INK+'" stroke-width=".8" opacity=".5"/>';
+    o+=furn(g.id,x,y,w,h);
+    var lx=g.attic?(g.id==='was'?x+136:x+40):x+w/2,ly=g.attic?y+52:y;
+    if(g.id==='overloop')lx=x+w-12;
+    if(n)o+='<circle class="hglow" cx="'+lx+'" cy="'+(ly+16)+'" r="'+Math.min(70,Math.max(w,h)*.62)+'" fill="url(#hglow)"/>';
+    o+='<path d="M'+lx+' '+ly+'v5" stroke="'+INK+'" stroke-width="1"/><path d="M'+(lx-6)+' '+(ly+11)+'l2.5 -6h7l2.5 6z" fill="'+(n?'#F6C76B':'#E9DCC6')+'" '+hs()+'/>';
+    if(n)o+='<circle cx="'+lx+'" cy="'+(ly+19)+'" r="8" fill="#E07A4F" stroke="#FFF3C4" stroke-width="1.6"/><text x="'+lx+'" y="'+(ly+22.4)+'" text-anchor="middle" class="hbadge">'+n+'</text>';
+    var tx=g.attic?(g.id==='was'?x+82:x+74):x+w/2;
+    o+='<text x="'+tx+'" y="'+(f+9.5)+'" text-anchor="middle" class="hlbl">'+esc(HNAME[g.id])+'</text>';
+    o+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="transparent" class="hhit"/></g>';
+  });
+  o+='<path d="M24 142L180 34L336 142" fill="none" stroke="#5B3A2E" stroke-width="3" stroke-linejoin="round"/><path d="M180 36v106" stroke="#B9765F" stroke-width="4"/>';
+  o+='<path d="M8 146h344M8 242h344" stroke="#B9765F" stroke-width="4"/>';
+  HGEO.forEach(function(g){if(!g.attic&&g.x>12)o+='<path d="M'+g.x+' '+g.y+'v'+g.h+'" stroke="#B9765F" stroke-width="4"/>';});
+  o+='<path d="M8 144h344" stroke="#5B3A2E" stroke-width="1.4"/>';
+  return {svg:o+'</svg>',lit:lit};
+}
+
+/* --- beginscherm --- */
+function upcomingEvents(){
+  var out=[],t=today();
+  for(var i=0;i<7&&out.length<4;i++){var k=addDays(t,i);eventsOn(k).forEach(function(e){if(out.length<4)out.push({e:e,k:k});});}
+  return out;
+}
+function viewHuis(){
+  if(!Array.isArray(S.house))migrateHouse();
+  var h=houseSVG(),html=header();
+  var sub=h.lit?'In '+h.lit+(h.lit===1?' kamer':' kamers')+' brandt een lampje. Kijk maar waar je zin in hebt.':'Alles is rustig in huis.';
+  if(S.thesis.session)sub='Thesistijd. Het huis wacht even.';
+  html+='<section class="hhero"><span class="eyebrow">'+esc(dateStr())+'</span><h1>'+greet()+'</h1><p class="lede">'+esc(sub)+'</p></section>';
+  html+='<div class="housewrap">'+h.svg+'</div>';
+  html+=jarCard();
+  var ev=upcomingEvents();
+  html+='<section class="card"><div class="head"><h3>Op de kalender</h3><button class="btn ghost sm" data-act="hevent">'+PLUS.replace('width="20" height="20"','width="16" height="16"')+' Afspraak</button></div>'+
+    (ev.length?'<div class="hevs">'+ev.map(function(x){var e=x.e;return '<button class="hev" data-act="editevent" data-id="'+esc(e.id)+'"><span class="hevd">'+esc(dayTitle(x.k))+(e.time?' '+esc(e.time):'')+'</span><span class="hevt">'+esc(e.title)+'</span></button>';}).join('')+'</div>'
+      :'<p class="small-note">Geen afspraken deze week.</p>')+'</section>';
+  return html;
+}
+
+/* --- een kamer --- */
+function hRow(t){
+  var due=hDue(t),left=hLeft(t);
+  var sub=due?(t.last?(diffDays(t.last,today())>t.every?'al even geleden':'vandaag fijn'):'nog niet gedaan'):(t.last===today()&&!t.seed?'net gedaan':left===1?'morgen':'over '+left+' dagen');
+  return '<div class="hrow'+(due?'':' later')+'"><button class="hmain" data-hold="done" data-id="h:'+esc(t.id)+'" aria-label="'+esc(t.text)+'. '+esc(sub)+'. Houd ingedrukt om af te ronden">'+
+    '<span class="check" aria-hidden="true">'+CHECK+'</span><span class="htxt"><b class="txt">'+esc(t.text)+'</b><small>'+esc(freqLabel(t.every))+' · '+esc(sub)+'</small></span></button>'+
+    '<button class="hedit" data-act="htask" data-id="'+esc(t.id)+'" aria-label="'+esc(t.text)+' aanpassen">'+PENCIL+'</button></div>';
+}
+function hSimpleRow(id,text,sub,done){
+  return '<div class="hrow'+(done?' isdone':'')+'">'+(done?'<div class="hmain"><span class="check on" aria-hidden="true">'+CHECK+'</span><span class="htxt"><b class="txt">'+esc(text)+'</b><small>gedaan</small></span></div>'
+    :'<button class="hmain" data-hold="done" data-id="'+esc(id)+'" aria-label="'+esc(text)+'. Houd ingedrukt om af te ronden"><span class="check" aria-hidden="true">'+CHECK+'</span><span class="htxt"><b class="txt">'+esc(text)+'</b><small>'+esc(sub)+'</small></span></button>')+'</div>';
+}
+function roomExtra(r){
+  var o='';
+  if(r==='keuken'){
+    var t=today(),dn=dinnerFor(t),dm=dinnerFor(addDays(t,1)),lu=lunchFor(t),n=shopLeft(),p=prepToday();
+    var nm=function(d){return d==='rest'?'restjes':d==='uit'?'uit eten':d&&d.name?d.name.toLowerCase():null;};
+    o+='<div class="hinfo"><p><b>Vanavond:</b> '+esc(nm(dn)||'nog niet gekozen')+(lu?'<br><b>Lunch:</b> '+esc(lu.name.toLowerCase()):'')+(nm(dm)?'<br><b>Morgen:</b> '+esc(nm(dm)):'')+'</p>'+
+      '<div class="rowbtns"><button class="btn soft sm" data-act="hgo" data-id="menu">Weekmenu</button><button class="btn soft sm" data-act="hgo" data-id="lijst">Boodschappen'+(n?' ('+n+')':'')+'</button></div></div>';
+    if(p)o+=hSimpleRow(p.id,p.text,'voor het eten van morgen',p.done);
+  }
+  if(r==='was'){
+    var ls=S.loads;
+    o+='<div class="hinfo">'+(ls.length?'<p>'+ls.map(function(l){var w=WASH[l.step];return '<b>'+esc(loadName(l)||'Was')+':</b> '+esc(w.state.toLowerCase())+(l.step===1&&l.endsAt&&Date.now()<l.endsAt?', klaar rond '+tsTime(l.endsAt):'');}).join('<br>')+'</p>':'<p>Er ligt geen was klaar.</p>')+
+      '<div class="rowbtns"><button class="btn soft sm" data-act="hgo" data-id="was">Naar de was</button></div></div>';
+    ls.filter(loadReady).forEach(function(l){var w=WASH[l.step];o+=hSimpleRow('wash:'+l.id,w.t+(loadName(l)?' ('+loadName(l).toLowerCase()+')':''),w.h,false);});
+  }
+  if(r==='gast'){
+    o+='<div class="hinfo"><p>Hier staat je bureau voor je thesis.'+(S.thesis.session?' Je thesistijd loopt nog '+sessionLeft()+' min.':'')+'</p><div class="rowbtns"><button class="btn soft sm" data-act="hgo" data-id="thesis">Naar je thesis</button></div></div>';
+  }
+  if(r==='gang'){
+    var ev=upcomingEvents();
+    o+='<div class="hinfo"><p>'+(ev.length?ev.map(function(x){return '<b>'+esc(dayTitle(x.k))+(x.e.time?' '+esc(x.e.time):'')+':</b> '+esc(x.e.title);}).join('<br>'):'Geen afspraken deze week.')+'</p><div class="rowbtns"><button class="btn soft sm" data-act="hevent">Afspraak toevoegen</button></div></div>';
+  }
+  return o;
+}
+function sheetHRoom(sh){
+  if(!Array.isArray(S.house))migrateHouse();
+  var r=sh.id,ts=S.house.filter(function(t){return t.room===r;});
+  var due=ts.filter(hDue),later=ts.filter(function(t){return !hDue(t);}).sort(function(a,b){return hLeft(a)-hLeft(b);});
+  var n=roomCount(r);
+  var html='<h2 id="sheetTitle">'+esc(hName(r))+'</h2><p class="note">'+(n?(n===1?'Er is één ding dat nu fijn is om te doen.':'Er zijn '+n+' dingen die nu fijn zijn om te doen.')+' Houd vast om af te vinken.':'Hier is nu niets te doen.')+'</p>';
+  html+=roomExtra(r);
+  if(due.length)html+='<div class="hlist">'+due.map(hRow).join('')+'</div>';
+  if(later.length)html+='<p class="hsec">Later</p><div class="hlist">'+later.map(hRow).join('')+'</div>';
+  html+='<div class="sheetbtns"><button class="btn ghost sm" data-act="close">Sluiten</button><button class="btn primary sm" data-act="htask" data-id="new:'+r+'">'+PLUS.replace('width="20" height="20"','width="16" height="16"')+' Iets toevoegen</button></div>';
+  return html;
+}
+function sheetHTask(sh){
+  var isNew=sh.id.indexOf('new:')===0,t=isNew?{room:sh.id.slice(4),text:'',every:7,min:10}:hTask(sh.id);
+  if(!t)return '<h2 id="sheetTitle">Niet gevonden</h2><div class="sheetbtns one"><button class="btn primary sm" data-act="close">Sluiten</button></div>';
+  return '<h2 id="sheetTitle">'+(isNew?'Iets toevoegen':'Aanpassen')+'</h2><p class="note">'+esc(hName(t.room))+'</p>'+
+    '<div class="fgroup"><label class="flabel" for="hText">Wat doe je?</label><input class="field" id="hText" type="text" value="'+esc(t.text)+'" placeholder="Bijvoorbeeld: ramen lappen" data-autofocus><p class="err" id="hErr" role="alert" hidden></p></div>'+
+    '<div class="fgroup"><span class="flabel">Hoe vaak?</span>'+chipGroup('hfreq',HFREQ,t.every,true)+'</div>'+
+    '<div class="fgroup"><span class="flabel">In welke kamer?</span>'+chipGroup('hroomsel',HGEO.map(function(g){return [g.id,HNAME[g.id]];}),t.room,true,'small')+'</div>'+
+    '<div class="sheetbtns">'+(isNew?'<button class="btn ghost sm" data-act="hback" data-id="'+esc(t.room)+'">Terug</button>':'<button class="btn ghost sm" data-act="hdel" data-id="'+esc(sh.id)+'">Weghalen</button>')+
+    '<button class="btn primary sm" data-act="hsave" data-id="'+esc(sh.id)+'">Opslaan</button></div>';
+}
+function hAct(a,id){
+  switch(a){
+    case 'hroom':openSheet({type:'hroom',id:id});return true;
+    case 'htask':openSheet({type:'htask',id:id,back:sheet&&sheet.type==='hroom'?sheet.id:null});return true;
+    case 'hback':openSheet({type:'hroom',id:id});return true;
+    case 'hsave':{
+      var txt=fval('hText').trim();if(!txt){showErr('hErr','Vul even in wat je doet.');return true;}
+      var ev=+(gv('hfreq')[0]||7),rm=gv('hroomsel')[0];
+      if(id.indexOf('new:')===0){rm=rm||id.slice(4);S.house.push({id:'hu-'+uid(),room:rm,text:txt,every:ev,min:10,last:null});}
+      else{var t=hTask(id);if(t){t.text=txt;t.every=ev;if(rm)t.room=rm;}}
+      save();render();openSheet({type:'hroom',id:rm||(sheet&&sheet.back)||'keuken'});toast('Opgeslagen');return true;}
+    case 'hdel':{
+      var t2=hTask(id);if(!t2)return true;var room=t2.room,snap=JSON.stringify(S.house);
+      S.house=S.house.filter(function(x){return x.id!==id;});save();render();openSheet({type:'hroom',id:room});
+      toast('Weggehaald',function(){S.house=JSON.parse(snap);save();render();if(sheet&&sheet.type==='hroom')renderSheet();});return true;}
+    case 'hgo':{
+      closeSheet();
+      if(id==='menu'||id==='lijst'){tab='eten';etenView=id;}else tab=id;
+      window.scrollTo(0,0);render();return true;}
+    case 'hevent':{
+      closeSheet();openSheet({type:'quick'});
+      var qb=sheetEl.querySelector('[data-act="qtype"][data-id="afspraak"]');
+      if(qb){qb.dispatchEvent(new MouseEvent('click',{bubbles:true}));if(qb.parentNode)qb.parentNode.hidden=true;}
+      var h2=document.getElementById('sheetTitle');if(h2)h2.textContent='Afspraak toevoegen';
+      return true;}
+  }
+  return false;
+}
+
 /* ===== Boodschappentas ===== */
 var AISLE_COLOR={groente:'#7DB06B',vlees:'#D47A6A',zuivel:'#7FA8D6',brood:'#C8955F',voorraad:'#E2B84E',diepvries:'#76C3CF',drogist:'#A98ED3',overig:'#A3A3A3'};
 var BAGITEMS=[
@@ -1992,10 +2349,13 @@ function renderInner(){
   var act=document.activeElement,fk=null;
   if(act&&act.dataset&&(act.dataset.act||act.dataset.hold)&&appEl.contains(act))fk=[act.dataset.act?'act':'hold',act.dataset.act||act.dataset.hold,act.dataset.id||''];
   var fid=act&&act.id&&appEl.contains(act)&&act.tagName==='INPUT'&&act.type==='text'?act.id:null,fv=fid?act.value:'';
-  var views={dag:viewDag,eten:viewEten,was:viewWas,thesis:viewThesis};
-  appEl.innerHTML=(views[tab]||viewDag)();
+  if(HOUSE&&tab==='dag')tab='huis';
+  var views={dag:viewDag,eten:viewEten,was:viewWas,thesis:viewThesis,huis:viewHuis};
+  var vh=(views[tab]||viewDag)();
+  if(HOUSE&&tab!=='huis')vh=vh.replace('<span class="brand">Huisritme</span>','<button class="brand hback" data-act="tab" data-id="huis">\u2039 Huis</button>');
+  appEl.innerHTML=vh;
   var n=shopLeft();
-  document.body.classList.toggle('solo',ME);
+  document.body.classList.toggle('solo',ME||HOUSE);
   tabsEl.innerHTML=TABS.map(function(t){
     var badge='';
     if(t.id==='eten'&&n)badge='<span class="badge" aria-label="'+n+' boodschappen nodig">'+n+'</span>';
@@ -2026,7 +2386,7 @@ function closeSheet(){sheet=null;sheetEl.hidden=true;sheetEl.innerHTML='';docume
 function renderSheet(first){
   if(!sheet){closeSheet();return;}
   var old=sheetEl.querySelector('.panel'),st=old?old.scrollTop:0;
-  var f={bons:sheetBons,jar:sheetJar,room:sheetRoom,task:sheetTask,quick:sheetQuick,event:sheetEvent,month:sheetMonth,library:sheetLibrary,capture:sheetCapture,pick:sheetPick,recipe:sheetRecipe,settings:sheetSettings,welcome:sheetWelcome,copy:sheetCopy,thesisnext:sheetThesisNext}[sheet.type];
+  var f={hroom:sheetHRoom,htask:sheetHTask,bons:sheetBons,jar:sheetJar,room:sheetRoom,task:sheetTask,quick:sheetQuick,event:sheetEvent,month:sheetMonth,library:sheetLibrary,capture:sheetCapture,pick:sheetPick,recipe:sheetRecipe,settings:sheetSettings,welcome:sheetWelcome,copy:sheetCopy,thesisnext:sheetThesisNext}[sheet.type];
   sheetEl.innerHTML='<div class="backdrop" data-act="close"></div><div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1"><div class="panel-in"><div class="grab" aria-hidden="true"></div>'+(f?f(sheet):'')+'</div></div>';
   sheetEl.hidden=false;document.documentElement.style.overflow='hidden';
   var p=sheetEl.querySelector('.panel');
@@ -2329,6 +2689,7 @@ document.addEventListener('click',function(e){
   }
   var b=e.target.closest('[data-act]');if(!b)return;
   var a=b.dataset.act,id=b.dataset.id;
+  if(hAct(a,id))return;
   switch(a){
     case 'close':closeSheet();return;
     case 'palette':
@@ -2574,7 +2935,7 @@ function burst(fill){
     an.onfinish=(function(el){return function(){el.remove();};})(s);
   }
 }
-function holdFill(el){return el.closest('.ev')||el.closest('.tile')||el.closest('.wst')||el.closest('.row')||el;}
+function holdFill(el){return el.closest('.hrow')||el.closest('.ev')||el.closest('.tile')||el.closest('.wst')||el.closest('.row')||el;}
 function finish(el,fill){
   busy=true;
   fill.classList.remove('holding');fill.classList.add('popped');
@@ -2584,7 +2945,7 @@ function finish(el,fill){
   setTimeout(function(){
     busy=false;
     var snap=JSON.stringify(S);
-    lastEarn=null;complete(id);var bon=lastEarn;lastEarn=null;var tier=syncDayCoins();save();render();
+    lastEarn=null;complete(id);var bon=lastEarn;lastEarn=null;var tier=syncDayCoins();save();render();if(sheet)renderSheet();
     var msg='Gedaan';
     if(id.indexOf('wash:')===0){var lid=id.slice(5),l=findLoad(lid);msg=l?(l.step===1&&l.endsAt?'Aangezet. Klaar rond '+tsTime(l.endsAt):WASH[l.step].state+': '+(loadName(l)||'was').toLowerCase()):'Was is helemaal klaar';}
     else if(tab==='dag'&&!queue().length)msg='Alles voor vandaag is gedaan';
@@ -2630,7 +2991,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&GS.open&&!s
   A.addListener('backButton',function(){
     if(sheet){if(sheet.type!=='welcome')closeSheet();return;}
     if(GS.open){gsClose();return;}
-    if(tab!=='dag'){tab='dag';agendaDay=today();weekOff=0;window.scrollTo(0,0);render();return;}
+    var home=HOUSE?'huis':'dag';if(tab!==home){tab=home;agendaDay=today();weekOff=0;window.scrollTo(0,0);render();return;}
     A.minimizeApp();
   });}catch(e){}})();
 document.addEventListener('pointerdown',function(e){
@@ -2649,6 +3010,7 @@ document.addEventListener('pointermove',function(e){
   var u=document.elementFromPoint(e.clientX,e.clientY);
   if(!u||!hold.fill.contains(u))cancelHold(false);
 });
+document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.getAttribute&&e.target.getAttribute('role')==='button'&&e.target.namespaceURI==='http://www.w3.org/2000/svg'){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}});
 document.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('[data-hold]'))e.preventDefault();});
 document.addEventListener('click',function(e){
   var el=e.target.closest('[data-hold]');
@@ -2679,7 +3041,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&!ho
 /* ================= start ================= */
 try{rollDay();}catch(e){}
 render();
-if(!S.setupDone)openSheet({type:'welcome'});
+if(!S.setupDone&&!HOUSE)openSheet({type:'welcome'});
 connect();
 var TAG='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z" fill="#3fb8af" stroke="#1f7f79" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="1.6" fill="#fff"/></svg>';
 var EGG='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><ellipse cx="12" cy="13" rx="6.5" ry="8.2" fill="#fbf3e6" stroke="#c9a77f" stroke-width="1.4"/></svg>';
